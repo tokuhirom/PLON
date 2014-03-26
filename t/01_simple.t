@@ -1,6 +1,5 @@
 use strict;
 use warnings;
-use utf8;
 use Test::More;
 use Test::Base::Less;
 use PSON;
@@ -33,4 +32,13 @@ __DATA__
 ===
 --- input: ['a\'']
 --- expected: ['a\'']
+
+===
+--- input: {x => 'y'}
+--- expected: {'x'=>'y'}
+
+===
+--- input: [0]
+--- expected: [0]
+
 
