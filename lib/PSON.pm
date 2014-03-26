@@ -19,9 +19,18 @@ sub new {
     }, $class;
 }
 
+sub pretty {
+    if (@_ == 1) {
+        $_[0]->{pretty};
+    } else {
+        $_[0]->{pretty} = $_[1];
+        $_[0];
+    }
+}
+
 sub ascii {
     if (@_ == 1) {
-        $_[0];
+        $_[0]->{ascii};
     } else {
         $_[0]->{ascii} = $_[1];
         $_[0];
@@ -30,7 +39,7 @@ sub ascii {
 
 sub encode {
     my ($self, $stuff) = @_;
-    local $INDENT = 0;
+    local $INDENT = -1;
     return $self->_encode($stuff);
 }
 
@@ -41,9 +50,28 @@ sub _encode {
     if (blessed $value) {
         die "PSON.pm doesn't support blessed reference(yet?)";
     } elsif (ref($value) eq 'ARRAY') {
-        '[' . join(',', map { $self->_encode($_) } @$value) . ']';
+        join('',
+            '[',
+            $self->_nl,
+            (map { $self->_indent(1) . $self->_encode($_) . "," . $self->_nl }
+                @$value),
+            $self->_indent,
+            ']',
+        );
     } elsif (ref($value) eq 'HASH') {
-        '{' . join(',', map { $self->_encode($_) . '=>' . $self->_encode($value->{$_}) } keys %$value) . '}';
+        join('',
+            '{',
+            $self->_nl,
+            (map {
+                    $self->_indent(1) . $self->_encode($_)
+                      . $self->_before_sp . '=>' . $self->_after_sp
+                      . $self->_encode($value->{$_})
+                      . "," . $self->_nl,
+                  }
+                  keys %$value),
+            $self->_indent,
+            '}',
+        );
     } elsif (!ref($value)) {
         my $flags = B::svref_2object(\$value)->FLAGS;
         return 0 + $value if $flags & (B::SVp_IOK | B::SVp_NOK) && $value * 0 == 0;
@@ -73,6 +101,27 @@ sub _encode {
     } else {
         die "Unknown type";
     }
+}
+
+sub _indent {
+    my ($self, $n) = @_;
+    $n //= 0;
+    $self->pretty ? '  ' x ($INDENT+$n) : ''
+}
+
+sub _nl {
+    my $self = shift;
+    $self->pretty ? "\n" : '',
+}
+
+sub _before_sp {
+    my $self = shift;
+    $self->pretty ? " " : ''
+}
+
+sub _after_sp {
+    my $self = shift;
+    $self->pretty ? " " : ''
 }
 
 1;
