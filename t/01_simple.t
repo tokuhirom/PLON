@@ -14,6 +14,7 @@ for my $block (blocks) {
         my $got = $pson->encode($block->input);
         is $got, $block->expected;
         is_deeply eval($got), $block->input;
+        is_deeply $pson->decode($got), $block->input;
      };
 }
 
@@ -27,18 +28,18 @@ __DATA__
 
 ===
 --- input: ['a']
---- expected: ['a']
+--- expected: ['a',]
 
 ===
 --- input: ['a\'']
---- expected: ['a\'']
+--- expected: ['a\'',]
 
 ===
 --- input: {x => 'y'}
---- expected: {'x'=>'y'}
+--- expected: {'x'=>'y',}
 
 ===
 --- input: [0]
---- expected: [0]
+--- expected: [0,]
 
 

@@ -13,6 +13,8 @@ our @EXPORT = qw(encode_pson);
 
 our $INDENT;
 
+my $WS = qr{[ \t]*};
+
 sub new {
     my $class = shift;
     bless {
@@ -82,7 +84,7 @@ sub _encode {
             if (Encode::is_utf8($value)) {
                 my $buf = '';
                 for (split //, $value) {
-                    if ($_ =~ /\A[a-zA-Z0-9_ -]\z/) {
+                    if ($_ =~ /\G[a-zA-Z0-9_ -]\z/) {
                         $buf .= Encode::encode_utf8($_);
                     } else {
                         $buf .= sprintf "\\x{%X}", ord $_;
@@ -124,6 +126,97 @@ sub _after_sp {
     $self->pretty ? " " : ''
 }
 
+sub decode {
+    my ($self, $src) = @_;
+    local $_ = $src;
+    return $self->_decode();
+}
+
+sub _decode {
+    my ($self) = @_;
+
+    if (/\G$WS\{/gc) {
+        return $self->_decode_hash();
+    } elsif (/\G$WS\[/gc) {
+        return $self->_decode_array();
+    } else {
+        die "Unexpected token: " . substr($_, 0, 2);
+    }
+}
+
+sub _decode_hash {
+    my ($self) = @_;
+
+    my %ret;
+    until (/\G$WS(,$WS)?\}/gc) {
+        my $k = $self->_decode_term();
+        /\G$WS=>$WS/gc
+            or _exception("Unexpected token in Hash");
+        my $v = $self->_decode_term();
+
+        $ret{$k} = $v;
+
+        /\G$WS,/gc
+            or last;
+    }
+    return \%ret;
+}
+
+sub _decode_array {
+    my ($self) = @_;
+
+    my @ret;
+    until (/\G$WS,?$WS\]/gc) {
+        my $term = $self->_decode_term();
+        push @ret, $term;
+    }
+    return \@ret;
+}
+
+sub _decode_term {
+    my ($self) = @_;
+
+    if (/\G$WS'/gc) {
+        return $self->_decode_string;
+    } elsif (/\G$WS([0-9\.]+)/gc) {
+        0+$1;
+    } else {
+        _exception("Not a term");
+    }
+}
+
+sub _decode_string {
+    my $self = shift;
+
+    my $ret;
+    until (/\G'/gc) {
+        if (/\G\\'/gc) {
+            $ret .= q{'};
+        } elsif (/\G([^'\\]+)/gc) {
+            $ret .= $1;
+        } else {
+            _exception("Unexpected EOF in string");
+        }
+    }
+    return $ret;
+}
+
+sub _exception {
+
+  # Leading whitespace
+  m/\G$WS/gc;
+
+  # Context
+  my $context = 'Malformed PSON: ' . shift;
+  if (m/\G\z/gc) { $context .= ' before end of data' }
+  else {
+    my @lines = split "\n", substr($_, 0, pos);
+    $context .= ' at line ' . @lines . ', offset ' . length(pop @lines || '');
+  }
+
+  die "$context\n";
+}
+
 1;
 __END__
 
@@ -140,6 +233,16 @@ PSON - It's new $module
 =head1 DESCRIPTION
 
 PSON is ...
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item C<< $pson->pretty(1) >>
+
+Set pretty mode.
+
+=back
 
 =head1 PSON and Unicode
 
