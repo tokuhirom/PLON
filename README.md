@@ -13,6 +13,13 @@ PSON - Serialize object to Perl code
 
 PSON is yet another serializer library for Perl5, has the JSON.pm like interface.
 
+# STABILITY
+
+This release is a prototype. Every API will change without notice.
+(But, I may not remove `encode_pson($scalar)` interface. You can use this.)
+
+I need your feedback. If you have ideas or comments, please report to [Github Issues](https://github.com/tokuhirom/PSON/issues).
+
 # OBJECT-ORIENTED INTERFACE
 
 The object oriented interface lets you configure your own encoding or
@@ -46,9 +53,10 @@ decoding style, within the limits of supported formats.
         PSON->new->ascii(1)->encode([chr 0x10401])
         => ["\x{10401}"]
 
-# PSON and Unicode
+# PSON Spec
 
-PSON only supports UTF-8. It must be UTF-8.
+- PSON only supports UTF-8. Serialized PSON string must be UTF-8.
+- PSON string must be eval-able.
 
 # LICENSE
 
