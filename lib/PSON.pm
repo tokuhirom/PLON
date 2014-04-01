@@ -308,17 +308,38 @@ PSON - Serialize object to Perl code
 
 PSON is yet another serializer library for Perl5, has the JSON.pm like interface.
 
-=head1 ATTRIBUTES
+=head1 OBJECT-ORIENTED INTERFACE
+
+The object oriented interface lets you configure your own encoding or
+decoding style, within the limits of supported formats.
 
 =over 4
 
-=item C<< $pson->pretty(1) >>
+=item $pson = PSON->new()
 
-Set pretty mode.
+Creates a new PSON object that can be used to de/encode PSON
+strings. All boolean flags described below are by default I<disabled>.
 
-=item C<< $pson->ascii(1) >>
+=item C<< $pson = $pson->pretty([$enabled]) >>
 
-Set ascii mode.
+This enables (or disables) all of the C<indent>, C<space_before> and
+C<space_after> (and in the future possibly more) flags in one call to
+generate the most readable (or most compact) form possible.
+
+=item C<< $pson->ascii([$enabled]) >>
+
+=item C<< my $enabled = $pson->get_ascii() >>
+
+    $pson = $pson->ascii([$enable])
+
+    $enabled = $pson->get_ascii
+
+If $enable is true (or missing), then the encode method will not generate characters outside
+the code range 0..127. Any Unicode characters outside that range will be escaped using either
+a \x{XXXX} escape sequence.
+
+If $enable is false, then the encode method will not escape Unicode characters unless
+required by the PSON syntax or other flags. This results in a faster and more compact format.
 
     PSON->new->ascii(1)->encode([chr 0x10401])
     => ["\x{10401}"]

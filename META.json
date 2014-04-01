@@ -1,5 +1,5 @@
 {
-   "abstract" : "It's new $module",
+   "abstract" : "Serialize object to Perl code",
    "author" : [
       "Tokuhiro Matsuno <tokuhirom@gmail.com>"
    ],
@@ -43,15 +43,30 @@
       },
       "runtime" : {
          "requires" : {
+            "Encode" : "0",
+            "Scalar::Util" : "0",
+            "parent" : "0",
             "perl" : "5.008005"
          }
       },
       "test" : {
          "requires" : {
+            "Test::Base::Less" : "0",
             "Test::More" : "0.98"
          }
       }
    },
    "release_status" : "unstable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tokuhirom/PSON/issues"
+      },
+      "homepage" : "https://github.com/tokuhirom/PSON",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tokuhirom/PSON.git",
+         "web" : "https://github.com/tokuhirom/PSON"
+      }
+   },
    "version" : "0.01"
 }
