@@ -15,6 +15,13 @@ for my $block (blocks) {
         is $got, $block->expected;
         is_deeply eval($got), $block->input;
         is_deeply $pson->decode($got), $block->input;
+
+        {
+            # decode with eval
+            my $dat = eval "use utf8;$got";
+            ok !$@ or diag $@;
+            is_deeply $dat, $block->input;
+        }
      };
 }
 
