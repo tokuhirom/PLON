@@ -11,7 +11,7 @@ PSON - Serialize object to Perl code
 
 # DESCRIPTION
 
-PSON is yet another serializer library for Perl5, has the JSON.pm like interface.
+PSON is yet another serialization library for Perl5, has the JSON.pm like interface.
 
 # STABILITY
 

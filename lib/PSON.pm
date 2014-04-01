@@ -148,7 +148,7 @@ sub _encode {
 
 sub _indent {
     my ($self, $n) = @_;
-    $n //= 0;
+    if (not defined $n) { $n = 0 };
     $self->get_pretty ? '  ' x ($INDENT+$n) : ''
 }
 
@@ -306,7 +306,7 @@ PSON - Serialize object to Perl code
 
 =head1 DESCRIPTION
 
-PSON is yet another serializer library for Perl5, has the JSON.pm like interface.
+PSON is yet another serialization library for Perl5, has the JSON.pm like interface.
 
 =head1 STABILITY
 
