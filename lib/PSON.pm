@@ -96,7 +96,23 @@ sub _encode {
             }
             q{"} . $value . q{"};
         } else {
-            $value =~ s/"/\\"/g;
+            my %special_chars = (
+                qq{"}  => q{\"},
+                qq{\n} => q{\n},
+                qq{\t} => q{\t},
+                qq{\f} => q{\f},
+                q{$}   => q{\$},
+                q{@}   => q{\@},
+                q{%}   => q{\%},
+                q{\\}  => q{\\\\},
+            );
+            $value =~ s/(.)/
+                if (exists($special_chars{$1})) {
+                    $special_chars{$1};
+                } else {
+                    $1
+                }
+            /gexs;
             $value = Encode::is_utf8($value) ? Encode::encode_utf8($value) : $value;
             q{"} . $value . q{"};
         }
@@ -194,6 +210,22 @@ sub _decode_string {
     until (/\G"/gc) {
         if (/\G\\"/gc) {
             $ret .= q{"};
+        } elsif (/\G\\\$/gc) {
+            $ret .= qq{\$};
+        } elsif (/\G\\n/gc) {
+            $ret .= qq{\n};
+        } elsif (/\G\\t/gc) {
+            $ret .= qq{\t};
+        } elsif (/\G\\f/gc) {
+            $ret .= qq{\f};
+        } elsif (/\G\\$/gc) {
+            $ret .= qq{\$};
+        } elsif (/\G\\@/gc) {
+            $ret .= qq{\@};
+        } elsif (/\G\\%/gc) {
+            $ret .= qq{\%};
+        } elsif (/\G\\\\/gc) {
+            $ret .= qq{\\};
         } elsif (/\G\\x\{([0-9a-fA-F]+)\}/gc) { # \x{5963}
             $ret .= chr(hex $1);
         } elsif (/\G([^"\\]+)/gc) {

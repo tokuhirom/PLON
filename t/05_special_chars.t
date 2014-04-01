@@ -30,33 +30,16 @@ done_testing;
 __DATA__
 
 ===
---- input: []
---- expected: []
+--- input: ["a\nb"]
+--- expected: ["a\nb",]
 
 ===
---- input: ["a"]
---- expected: ["a",]
+--- input: ["a\tb"]
+--- expected: ["a\tb",]
 
 ===
---- input: ["a\""]
---- expected: ["a\"",]
+--- input: ["a\fb"]
+--- expected: ["a\fb",]
 
-===
---- input: {x => "y"}
---- expected: {"x"=>"y",}
 
-===
---- input: [0]
---- expected: [0,]
 
-===
---- input: ["\$x"]
---- expected: ["\$x",]
-
-===
---- input: ["\@x"]
---- expected: ["\@x",]
-
-===
---- input: ["\\x"]
---- expected: ["\\x",]
