@@ -139,6 +139,8 @@ sub _decode {
         return $self->_decode_hash();
     } elsif (/\G$WS\[/gc) {
         return $self->_decode_array();
+    } elsif (/\G$WS'/gc) {
+        return $self->_decode_string();
     } else {
         die "Unexpected token: " . substr($_, 0, 2);
     }
@@ -192,13 +194,17 @@ sub _decode_string {
     until (/\G'/gc) {
         if (/\G\\'/gc) {
             $ret .= q{'};
+        } elsif (/\G\\x\{([0-9a-fA-F]+)\}/gc) { # \x{5963}
+            $ret .= chr(hex $1);
         } elsif (/\G([^'\\]+)/gc) {
             $ret .= $1;
         } else {
             _exception("Unexpected EOF in string");
         }
     }
-    return $ret;
+    # If it's utf-8, it means the PSON encoded by ASCII mode.
+    # The PSON contains "\x{5963}". Then, we shouldn't decode the string.
+    return Encode::is_utf8($ret) ? $ret : Encode::decode_utf8($ret);
 }
 
 sub _exception {
