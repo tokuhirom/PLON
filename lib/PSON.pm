@@ -80,7 +80,7 @@ sub _encode {
 
         # string
         if ($self->{ascii}) {
-            $value =~ s/'/\\'/g;
+            $value =~ s/"/\\"/g;
             if (Encode::is_utf8($value)) {
                 my $buf = '';
                 for (split //, $value) {
@@ -94,11 +94,11 @@ sub _encode {
             } else {
                 $value = $value;
             }
-            q{'} . $value . q{'};
+            q{"} . $value . q{"};
         } else {
-            $value =~ s/'/\\'/g;
+            $value =~ s/"/\\"/g;
             $value = Encode::is_utf8($value) ? Encode::encode_utf8($value) : $value;
-            q{'} . $value . q{'};
+            q{"} . $value . q{"};
         }
     } else {
         die "Unknown type";
@@ -139,7 +139,7 @@ sub _decode {
         return $self->_decode_hash();
     } elsif (/\G$WS\[/gc) {
         return $self->_decode_array();
-    } elsif (/\G$WS'/gc) {
+    } elsif (/\G$WS"/gc) {
         return $self->_decode_string();
     } else {
         die "Unexpected token: " . substr($_, 0, 2);
@@ -178,7 +178,7 @@ sub _decode_array {
 sub _decode_term {
     my ($self) = @_;
 
-    if (/\G$WS'/gc) {
+    if (/\G$WS"/gc) {
         return $self->_decode_string;
     } elsif (/\G$WS([0-9\.]+)/gc) {
         0+$1;
@@ -191,12 +191,12 @@ sub _decode_string {
     my $self = shift;
 
     my $ret;
-    until (/\G'/gc) {
-        if (/\G\\'/gc) {
-            $ret .= q{'};
+    until (/\G"/gc) {
+        if (/\G\\"/gc) {
+            $ret .= q{"};
         } elsif (/\G\\x\{([0-9a-fA-F]+)\}/gc) { # \x{5963}
             $ret .= chr(hex $1);
-        } elsif (/\G([^'\\]+)/gc) {
+        } elsif (/\G([^"\\]+)/gc) {
             $ret .= $1;
         } else {
             _exception("Unexpected EOF in string");

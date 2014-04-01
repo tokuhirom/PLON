@@ -13,7 +13,7 @@ subtest 'Normal mode', sub {
     # Then response is encoded
     ok !Encode::is_utf8($pson);
     # And response is 'あ'
-    is $pson, encode_utf8("'\x{3042}'");
+    is $pson, encode_utf8(qq!"\x{3042}"!);
     # When decode the response,
     my $decoded = PSON->new->decode($pson);
     # Then got a original source.
@@ -28,7 +28,7 @@ subtest 'Ascii mode', sub {
     # Then response is encoded
     ok !Encode::is_utf8($pson);
     # And response is 'あ'
-    is $pson, q{'\x{3042}a'};
+    is $pson, q{"\x{3042}a"};
     # When decode the response,
     my $decoded = PSON->new->decode($pson);
     # Then got a original source.

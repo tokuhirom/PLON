@@ -10,10 +10,10 @@ my $pson = PSON->new->pretty(1)->encode([
 is $pson, n(<<'...');
 [
   {
-    'a' => [
-      'x',
-      'y',
-      'z',
+    "a" => [
+      "x",
+      "y",
+      "z",
     ],
   },
 ]
@@ -25,12 +25,12 @@ my $pson = PSON->new->pretty(1)->encode({
 });
 is $pson, n(<<'...');
 {
-  'x' => [
-    'a',
+  "x" => [
+    "a",
     [
-      'x',
-      'y',
-      'z',
+      "x",
+      "y",
+      "z",
     ],
   ],
 }

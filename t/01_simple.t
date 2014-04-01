@@ -34,16 +34,16 @@ __DATA__
 --- expected: []
 
 ===
---- input: ['a']
---- expected: ['a',]
+--- input: ["a"]
+--- expected: ["a",]
 
 ===
---- input: ['a\'']
---- expected: ['a\'',]
+--- input: ["a\""]
+--- expected: ["a\"",]
 
 ===
---- input: {x => 'y'}
---- expected: {'x'=>'y',}
+--- input: {x => "y"}
+--- expected: {"x"=>"y",}
 
 ===
 --- input: [0]
