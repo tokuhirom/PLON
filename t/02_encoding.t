@@ -18,6 +18,8 @@ subtest 'Normal mode', sub {
     my $decoded = PSON->new->decode($pson);
     # Then got a original source.
     is $decoded, $src;
+    # You can decode with 'eval'.
+    is eval "use utf8; $pson", $src;
 };
 
 subtest 'Ascii mode', sub {
@@ -33,8 +35,8 @@ subtest 'Ascii mode', sub {
     my $decoded = PSON->new->decode($pson);
     # Then got a original source.
     is $decoded, $src;
-#   # You can decode with 'eval'.
-#   is eval "use utf8; $pson", $src;
+    # You can decode with 'eval'.
+    is eval "use utf8; $pson", $src;
 };
 
 done_testing;
