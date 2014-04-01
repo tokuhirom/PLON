@@ -20,14 +20,16 @@ sub mk_accessor {
 
     no strict 'refs';
     *{"${pkg}::${name}"} = sub {
-        if (@_ == 1) {
-            $_[0]->{$name};
-        } elsif (@_==2) {
-            $_[0]->{$name} = $_[1];
-            $_[0];
+        my $enable = defined($_[1]) ? $_[1] : 1;
+        if ($enable) {
+            $_[0]->{$name} = 1;
         } else {
-            Carp::croak("Too much arguments for '$name' method: " . 0+@_);
+            $_[0]->{$name} = 0;
         }
+        $_[0];
+    };
+    *{"${pkg}::get_${name}"} = sub {
+        $_[0]->{$name} ? 1 : '';
     };
 }
 
@@ -147,22 +149,22 @@ sub _encode {
 sub _indent {
     my ($self, $n) = @_;
     $n //= 0;
-    $self->pretty ? '  ' x ($INDENT+$n) : ''
+    $self->get_pretty ? '  ' x ($INDENT+$n) : ''
 }
 
 sub _nl {
     my $self = shift;
-    $self->pretty ? "\n" : '',
+    $self->get_pretty ? "\n" : '',
 }
 
 sub _before_sp {
     my $self = shift;
-    $self->pretty ? " " : ''
+    $self->get_pretty ? " " : ''
 }
 
 sub _after_sp {
     my $self = shift;
-    $self->pretty ? " " : ''
+    $self->get_pretty ? " " : ''
 }
 
 sub decode {
@@ -313,6 +315,13 @@ PSON is yet another serializer library for Perl5, has the JSON.pm like interface
 =item C<< $pson->pretty(1) >>
 
 Set pretty mode.
+
+=item C<< $pson->ascii(1) >>
+
+Set ascii mode.
+
+    PSON->new->ascii(1)->encode([chr 0x10401])
+    => ["\x{10401}"]
 
 =back
 
