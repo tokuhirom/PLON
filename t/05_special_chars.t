@@ -41,5 +41,8 @@ __DATA__
 --- input: ["a\fb"]
 --- expected: ["a\fb",]
 
+===
+--- input: ["a\r\b\a\eb"]
+--- expected: ["a\r\b\a\eb",]
 
 

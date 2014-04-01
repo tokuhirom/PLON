@@ -96,11 +96,34 @@ sub _encode {
             }
             q{"} . $value . q{"};
         } else {
+            #
+            # Here is the list of special characters from perlop.pod
+            #
+            # Sequence     Note  Description
+            # \t                  tab               (HT, TAB)
+            # \n                  newline           (NL)
+            # \r                  return            (CR)
+            # \f                  form feed         (FF)
+            # \b                  backspace         (BS)
+            # \a                  alarm (bell)      (BEL)
+            # \e                  escape            (ESC)
+            # \x{263A}     [1,8]  hex char          (example: SMILEY)
+            # \x1b         [2,8]  restricted range hex char (example: ESC)
+            # \N{name}     [3]    named Unicode character or character sequence
+            # \N{U+263D}   [4,8]  Unicode character (example: FIRST QUARTER MOON)
+            # \c[          [5]    control char      (example: chr(27))
+            # \o{23072}    [6,8]  octal char        (example: SMILEY)
+            # \033         [7,8]  restricted range octal char  (example: ESC)
+            #
             my %special_chars = (
                 qq{"}  => q{\"},
-                qq{\n} => q{\n},
                 qq{\t} => q{\t},
+                qq{\n} => q{\n},
+                qq{\r} => q{\r},
                 qq{\f} => q{\f},
+                qq{\b} => q{\b},
+                qq{\a} => q{\a},
+                qq{\e} => q{\e},
                 q{$}   => q{\$},
                 q{@}   => q{\@},
                 q{%}   => q{\%},
@@ -212,12 +235,20 @@ sub _decode_string {
             $ret .= q{"};
         } elsif (/\G\\\$/gc) {
             $ret .= qq{\$};
-        } elsif (/\G\\n/gc) {
-            $ret .= qq{\n};
         } elsif (/\G\\t/gc) {
             $ret .= qq{\t};
+        } elsif (/\G\\n/gc) {
+            $ret .= qq{\n};
+        } elsif (/\G\\r/gc) {
+            $ret .= qq{\r};
         } elsif (/\G\\f/gc) {
             $ret .= qq{\f};
+        } elsif (/\G\\b/gc) {
+            $ret .= qq{\b};
+        } elsif (/\G\\a/gc) {
+            $ret .= qq{\a};
+        } elsif (/\G\\e/gc) {
+            $ret .= qq{\e};
         } elsif (/\G\\$/gc) {
             $ret .= qq{\$};
         } elsif (/\G\\@/gc) {
