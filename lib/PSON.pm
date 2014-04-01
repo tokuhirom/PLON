@@ -15,29 +15,29 @@ our $INDENT;
 
 my $WS = qr{[ \t]*};
 
+sub mk_accessor {
+    my ($pkg, $name) = @_;
+
+    no strict 'refs';
+    *{"${pkg}::${name}"} = sub {
+        if (@_ == 1) {
+            $_[0]->{$name};
+        } elsif (@_==2) {
+            $_[0]->{$name} = $_[1];
+            $_[0];
+        } else {
+            Carp::croak("Too much arguments for '$name' method: " . 0+@_);
+        }
+    };
+}
+
 sub new {
     my $class = shift;
     bless {
     }, $class;
 }
 
-sub pretty {
-    if (@_ == 1) {
-        $_[0]->{pretty};
-    } else {
-        $_[0]->{pretty} = $_[1];
-        $_[0];
-    }
-}
-
-sub ascii {
-    if (@_ == 1) {
-        $_[0]->{ascii};
-    } else {
-        $_[0]->{ascii} = $_[1];
-        $_[0];
-    }
-}
+mk_accessor(__PACKAGE__, $_) for qw(pretty ascii);
 
 sub encode {
     my ($self, $stuff) = @_;
@@ -224,15 +224,18 @@ __END__
 
 =head1 NAME
 
-PSON - It's new $module
+PSON - Serialize object to Perl code
 
 =head1 SYNOPSIS
 
     use PSON;
 
+    my $pson = encode_pson([]);
+    # $pson is `[]`
+
 =head1 DESCRIPTION
 
-PSON is ...
+PSON is yet another serializer library for Perl5, has the JSON.pm like interface.
 
 =head1 ATTRIBUTES
 
