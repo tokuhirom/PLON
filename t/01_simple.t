@@ -60,3 +60,11 @@ __DATA__
 ===
 --- input: ["\\x"]
 --- expected: ["\\x",]
+
+===
+--- input: undef
+--- expected: undef
+
+===
+--- input: [undef]
+--- expected: [undef,]

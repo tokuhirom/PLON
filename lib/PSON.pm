@@ -53,7 +53,9 @@ sub _encode {
     my ($self, $value) = @_;
     local $INDENT = $INDENT + 1;
 
-    if (blessed $value) {
+    if (not defined $value) {
+        'undef';
+    } elsif (blessed $value) {
         die "PSON.pm doesn't support blessed reference(yet?)";
     } elsif (ref($value) eq 'ARRAY') {
         join('',
@@ -184,6 +186,8 @@ sub _decode {
         return $self->_decode_array();
     } elsif (/\G$WS"/gc) {
         return $self->_decode_string();
+    } elsif (/\G${WS}undef/gc) {
+        return undef;
     } else {
         die "Unexpected token: " . substr($_, 0, 2);
     }
@@ -225,6 +229,8 @@ sub _decode_term {
         return $self->_decode_string;
     } elsif (/\G$WS([0-9\.]+)/gc) {
         0+$1;
+    } elsif (/\G${WS}undef/gc) {
+        return undef;
     } else {
         _exception("Not a term");
     }
