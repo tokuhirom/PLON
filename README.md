@@ -13,6 +13,13 @@ PSON - Serialize object to Perl code
 
 PSON is yet another serialization library for Perl5, has the JSON.pm like interface.
 
+# WHY?
+
+I need data dumper library supports JSON::XS/JSON::PP like interface.
+I use JSON::XS really hard. Then, I want to use other serialization library with JSON::XS/JSON::PP's interface.
+
+Data::Dumper escapes multi byte chars. When I want copy-and-paste from Data::Dumper's output to my test code, I need to un-escape `\x{5963}` by my hand. PSON.pm don't escape multi byte characters by default.
+
 # STABILITY
 
 This release is a prototype. Every API will change without notice.
