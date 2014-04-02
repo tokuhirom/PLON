@@ -15,6 +15,8 @@ our $INDENT;
 
 my $WS = qr{[ \t]*};
 
+sub encode_pson { PSON->new->encode(shift) }
+
 sub mk_accessor {
     my ($pkg, $name) = @_;
 
