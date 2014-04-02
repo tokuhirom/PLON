@@ -7,15 +7,16 @@ use parent qw(Exporter);
 use B;
 use Encode ();
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
-our @EXPORT = qw(encode_pson);
+our @EXPORT = qw(encode_pson decode_pson);
 
 our $INDENT;
 
 my $WS = qr{[ \t]*};
 
 sub encode_pson { PSON->new->encode(shift) }
+sub decode_pson { PSON->new->decode(shift) }
 
 sub mk_accessor {
     my ($pkg, $name) = @_;
