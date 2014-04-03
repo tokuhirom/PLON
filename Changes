@@ -2,6 +2,10 @@ Revision history for Perl extension PLON
 
 {{$NEXT}}
 
+0.06 2014-04-03T15:35:02Z
+
+    - Document deparse option.
+
 0.05 2014-04-03T15:22:40Z
 
     - PSON renamed PLON. Because there is PHP library named PSON.

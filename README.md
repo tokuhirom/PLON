@@ -60,6 +60,12 @@ decoding style, within the limits of supported formats.
         PLON->new->ascii(1)->encode([chr 0x10401])
         => ["\x{10401}"]
 
+- `$pson->deparse([$enabled])`
+- `my $enabled = $pson->get_deparse()`
+
+    If $enable is true (or missing), then the encode method will de-parse the code by [B::Deparse](https://metacpan.org/pod/B::Deparse).
+    Otherwise, encoder generates `sub { "DUMMY" }` like [Data::Dumper](https://metacpan.org/pod/Data::Dumper).
+
 # PLON Spec
 
 - PLON only supports UTF-8. Serialized PLON string must be UTF-8.
@@ -75,3 +81,9 @@ it under the same terms as Perl itself.
 # AUTHOR
 
 Tokuhiro Matsuno <tokuhirom@gmail.com>
+
+# SEE ALSO
+
+- [Data::Dumper](https://metacpan.org/pod/Data::Dumper)
+- [Data::Pond](https://metacpan.org/pod/Data::Pond)
+- [Acme::PSON](https://metacpan.org/pod/Acme::PSON)
