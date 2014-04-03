@@ -7,7 +7,7 @@ use parent qw(Exporter);
 use B;
 use Encode ();
 
-our $VERSION = "0.04";
+our $VERSION = "0.05";
 
 our @EXPORT = qw(encode_pson decode_pson);
 

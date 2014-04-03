@@ -2,6 +2,11 @@ Revision history for Perl extension PLON
 
 {{$NEXT}}
 
+0.05 2014-04-03T15:22:40Z
+
+    - PSON renamed PLON. Because there is PHP library named PSON.
+    - Added CodeRef serialization feature.
+
 0.04 2014-04-02T12:03:09Z
 
     - Added 'decode_pson' method.
