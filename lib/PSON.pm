@@ -42,7 +42,7 @@ sub new {
     }, $class;
 }
 
-mk_accessor(__PACKAGE__, $_) for qw(pretty ascii);
+mk_accessor(__PACKAGE__, $_) for qw(pretty ascii deparse);
 
 sub encode {
     my ($self, $stuff) = @_;
@@ -67,6 +67,22 @@ sub _encode {
             $self->_indent,
             ']',
         );
+    } elsif (ref($value) eq 'CODE') {
+        if ($self->get_deparse) {
+            require B::Deparse;
+            my $code = B::Deparse->new($self->get_pretty ? '' : '-si0')->coderef2text($value);
+            $code = "sub ${code}";
+            if ($self->get_pretty) {
+                my $indent = $self->_indent;
+                $code =~ s/^/$indent/gm;
+                $code;
+            } else {
+                $code =~ s/\n//g;
+                $code;
+            }
+        } else {
+            'sub { "DUMMY" }'
+        }
     } elsif (ref($value) eq 'HASH') {
         join('',
             '{',
@@ -189,6 +205,8 @@ sub _decode {
         return $self->_decode_string();
     } elsif (/\G${WS}undef/gc) {
         return undef;
+    } elsif (/\G${WS}sub\s*\{/gc) {
+        Carp::confess("Cannot decode PSON contains CodeRef.");
     } else {
         die "Unexpected token: " . substr($_, 0, 2);
     }
