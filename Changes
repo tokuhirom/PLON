@@ -1,4 +1,4 @@
-Revision history for Perl extension PSON
+Revision history for Perl extension PLSON
 
 {{$NEXT}}
 
@@ -10,10 +10,10 @@ Revision history for Perl extension PSON
 
     - Support undefined value
       (Reported by sharl++)
-      https://github.com/tokuhirom/PSON/issues/3
+      https://github.com/tokuhirom/PLSON/issues/3
     - Implemented 'encode_pson' method.
       (Reported by syohex++)
-      https://github.com/tokuhirom/PSON/issues/2
+      https://github.com/tokuhirom/PLSON/issues/2
 
 0.02 2014-04-02T00:04:00Z
 

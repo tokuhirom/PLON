@@ -2,9 +2,9 @@ use strict;
 use warnings;
 use utf8;
 use Test::More;
-use PSON;
+use PLSON;
 
-my $pson = PSON->new->pretty(1)->encode([
+my $pson = PLSON->new->pretty(1)->encode([
     {a => [ qw(x y z)]},
 ]);
 is $pson, n(<<'...');
@@ -20,7 +20,7 @@ is $pson, n(<<'...');
 ...
 
 {
-my $pson = PSON->new->pretty(1)->encode({
+my $pson = PLSON->new->pretty(1)->encode({
     x => [a => [ qw(x y z)]],
 });
 is $pson, n(<<'...');

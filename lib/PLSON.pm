@@ -1,4 +1,4 @@
-package PSON;
+package PLSON;
 use 5.008005;
 use strict;
 use warnings;
@@ -15,8 +15,8 @@ our $INDENT;
 
 my $WS = qr{[ \t]*};
 
-sub encode_pson { PSON->new->encode(shift) }
-sub decode_pson { PSON->new->decode(shift) }
+sub encode_pson { PLSON->new->encode(shift) }
+sub decode_pson { PLSON->new->decode(shift) }
 
 sub mk_accessor {
     my ($pkg, $name) = @_;
@@ -57,7 +57,7 @@ sub _encode {
     if (not defined $value) {
         'undef';
     } elsif (blessed $value) {
-        die "PSON.pm doesn't support blessed reference(yet?)";
+        die "PLSON.pm doesn't support blessed reference(yet?)";
     } elsif (ref($value) eq 'ARRAY') {
         join('',
             '[',
@@ -206,7 +206,7 @@ sub _decode {
     } elsif (/\G${WS}undef/gc) {
         return undef;
     } elsif (/\G${WS}sub\s*\{/gc) {
-        Carp::confess("Cannot decode PSON contains CodeRef.");
+        Carp::confess("Cannot decode PLSON contains CodeRef.");
     } else {
         die "Unexpected token: " . substr($_, 0, 2);
     }
@@ -294,8 +294,8 @@ sub _decode_string {
             _exception("Unexpected EOF in string");
         }
     }
-    # If it's utf-8, it means the PSON encoded by ASCII mode.
-    # The PSON contains "\x{5963}". Then, we shouldn't decode the string.
+    # If it's utf-8, it means the PLSON encoded by ASCII mode.
+    # The PLSON contains "\x{5963}". Then, we shouldn't decode the string.
     return Encode::is_utf8($ret) ? $ret : Encode::decode_utf8($ret);
 }
 
@@ -305,7 +305,7 @@ sub _exception {
   m/\G$WS/gc;
 
   # Context
-  my $context = 'Malformed PSON: ' . shift;
+  my $context = 'Malformed PLSON: ' . shift;
   if (m/\G\z/gc) { $context .= ' before end of data' }
   else {
     my @lines = split "\n", substr($_, 0, pos);
@@ -322,32 +322,32 @@ __END__
 
 =head1 NAME
 
-PSON - Serialize object to Perl code
+PLSON - Serialize object to Perl code
 
 =head1 SYNOPSIS
 
-    use PSON;
+    use PLSON;
 
     my $pson = encode_pson([]);
     # $pson is `[]`
 
 =head1 DESCRIPTION
 
-PSON is yet another serialization library for Perl5, has the JSON.pm like interface.
+PLSON is yet another serialization library for Perl5, has the JSON.pm like interface.
 
 =head1 WHY?
 
 I need data dumper library supports JSON::XS/JSON::PP like interface.
 I use JSON::XS really hard. Then, I want to use other serialization library with JSON::XS/JSON::PP's interface.
 
-Data::Dumper escapes multi byte chars. When I want copy-and-paste from Data::Dumper's output to my test code, I need to un-escape C<\x{5963}> by my hand. PSON.pm don't escape multi byte characters by default.
+Data::Dumper escapes multi byte chars. When I want copy-and-paste from Data::Dumper's output to my test code, I need to un-escape C<\x{5963}> by my hand. PLSON.pm don't escape multi byte characters by default.
 
 =head1 STABILITY
 
 This release is a prototype. Every API will change without notice.
 (But, I may not remove C<encode_pson($scalar)> interface. You can use this.)
 
-I need your feedback. If you have ideas or comments, please report to L<Github Issues|https://github.com/tokuhirom/PSON/issues>.
+I need your feedback. If you have ideas or comments, please report to L<Github Issues|https://github.com/tokuhirom/PLSON/issues>.
 
 =head1 OBJECT-ORIENTED INTERFACE
 
@@ -356,9 +356,9 @@ decoding style, within the limits of supported formats.
 
 =over 4
 
-=item $pson = PSON->new()
+=item $pson = PLSON->new()
 
-Creates a new PSON object that can be used to de/encode PSON
+Creates a new PLSON object that can be used to de/encode PLSON
 strings. All boolean flags described below are by default I<disabled>.
 
 =item C<< $pson = $pson->pretty([$enabled]) >>
@@ -380,20 +380,20 @@ the code range 0..127. Any Unicode characters outside that range will be escaped
 a \x{XXXX} escape sequence.
 
 If $enable is false, then the encode method will not escape Unicode characters unless
-required by the PSON syntax or other flags. This results in a faster and more compact format.
+required by the PLSON syntax or other flags. This results in a faster and more compact format.
 
-    PSON->new->ascii(1)->encode([chr 0x10401])
+    PLSON->new->ascii(1)->encode([chr 0x10401])
     => ["\x{10401}"]
 
 =back
 
-=head1 PSON Spec
+=head1 PLSON Spec
 
 =over 4
 
-=item PSON only supports UTF-8. Serialized PSON string must be UTF-8.
+=item PLSON only supports UTF-8. Serialized PLSON string must be UTF-8.
 
-=item PSON string must be eval-able.
+=item PLSON string must be eval-able.
 
 =back
 
