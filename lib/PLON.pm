@@ -206,7 +206,7 @@ sub _decode {
     } elsif (/\G${WS}undef/gc) {
         return undef;
     } elsif (/\G${WS}sub\s*\{/gc) {
-        Carp::confess("Cannot decode PLON contains CodeRef.");
+        return $self->_decode_code();
     } else {
         die "Unexpected token: " . substr($_, 0, 2);
     }
@@ -250,9 +250,17 @@ sub _decode_term {
         0+$1;
     } elsif (/\G${WS}undef/gc) {
         return undef;
+    } elsif (/\G${WS}sub\s*\{/gc) {
+        return $self->_decode_code();
     } else {
         _exception("Not a term");
     }
+}
+
+sub _decode_code {
+    # We can't decode coderef. Because it makes security issue.
+    # And, we can't detect end of code block.
+    Carp::confess("Cannot decode PLON contains CodeRef.");
 }
 
 sub _decode_string {
