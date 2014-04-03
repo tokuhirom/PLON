@@ -23,8 +23,8 @@ my %args = (
         'Module::Build' => 0.38,
     },
 
-    name            => 'PLSON',
-    module_name     => 'PLSON',
+    name            => 'PLON',
+    module_name     => 'PLON',
     allow_pureperl => 0,
 
     script_files => [glob('script/*'), glob('bin/*')],

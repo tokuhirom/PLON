@@ -12,7 +12,7 @@
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : "2"
    },
-   "name" : "PLSON",
+   "name" : "PLON",
    "no_index" : {
       "directory" : [
          "t",
@@ -59,13 +59,13 @@
    "release_status" : "unstable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/tokuhirom/PLSON/issues"
+         "web" : "https://github.com/tokuhirom/PLON/issues"
       },
-      "homepage" : "https://github.com/tokuhirom/PLSON",
+      "homepage" : "https://github.com/tokuhirom/PLON",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/tokuhirom/PLSON.git",
-         "web" : "https://github.com/tokuhirom/PLSON"
+         "url" : "git://github.com/tokuhirom/PLON.git",
+         "web" : "https://github.com/tokuhirom/PLON"
       }
    },
    "version" : "0.04"

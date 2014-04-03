@@ -2,13 +2,13 @@ use strict;
 use warnings;
 use Test::More;
 use Test::Base::Less;
-use PLSON;
+use PLON;
 
 filters {
     input => ['eval'],
 };
 
-my $pson = PLSON->new();
+my $pson = PLON->new();
 for my $block (blocks) {
     subtest $block->expected, sub {
         my $got = $pson->encode($block->input);
