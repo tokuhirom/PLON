@@ -188,6 +188,8 @@ sub _encode_basic {
             $self->_indent,
             '}',
         );
+    } elsif ($reftype eq 'GLOB') {
+        "\\(" . $$value . ")";
     } else {
         die "Unknown type: ${reftype}";
     }
@@ -243,6 +245,9 @@ sub _decode {
         return $self->_decode_object;
     } elsif (/\G${WS}do \{my \$o=/gc) {
         return $self->_decode_do;
+    } elsif (/\G$WS\*([a-zA-Z0-9_:]+)/gc) {
+        no strict 'refs';
+        *{$1};
     } else {
         Carp::confess("Unexpected token: " . substr($_, pos, 9));
     }
