@@ -8,7 +8,7 @@ use B;
 use Encode ();
 use Carp ();
 
-our $VERSION = "0.06";
+our $VERSION = "0.07";
 
 our @EXPORT = qw(encode_pson decode_pson);
 

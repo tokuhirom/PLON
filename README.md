@@ -66,6 +66,13 @@ decoding style, within the limits of supported formats.
     If $enable is true (or missing), then the encode method will de-parse the code by [B::Deparse](https://metacpan.org/pod/B::Deparse).
     Otherwise, encoder generates `sub { "DUMMY" }` like [Data::Dumper](https://metacpan.org/pod/Data::Dumper).
 
+- `$pson->canonical([$enabled])`
+- `my $enabled = $pson->get_canonical()`
+
+    If $enable is true (or missing), then the "encode" method will output
+    PLON objects by sorting their keys. This is adding a comparatively
+    high overhead.
+
 # PLON Spec
 
 - PLON only supports UTF-8. Serialized PLON string must be UTF-8.
