@@ -1,8 +1,8 @@
 package PLON;
 use 5.008005;
 use strict;
-use warnings;
-use Scalar::Util qw(blessed);
+use warnings FATAL => 'all';
+use Scalar::Util qw(blessed reftype);
 use parent qw(Exporter);
 use B;
 use Encode ();
@@ -54,54 +54,24 @@ sub _encode {
     my ($self, $value) = @_;
     local $INDENT = $INDENT + 1;
 
-    if (not defined $value) {
-        'undef';
-    } elsif (blessed $value) {
-        die "PLON.pm doesn't support blessed reference(yet?)";
-    } elsif (ref($value) eq 'ARRAY') {
-        join('',
-            '[',
-            $self->_nl,
-            (map { $self->_indent(1) . $self->_encode($_) . "," . $self->_nl }
-                @$value),
-            $self->_indent,
-            ']',
-        );
-    } elsif (ref($value) eq 'CODE') {
-        if ($self->get_deparse) {
-            require B::Deparse;
-            my $code = B::Deparse->new($self->get_pretty ? '' : '-si0')->coderef2text($value);
-            $code = "sub ${code}";
-            if ($self->get_pretty) {
-                my $indent = $self->_indent;
-                $code =~ s/^/$indent/gm;
-                $code;
-            } else {
-                $code =~ s/\n//g;
-                $code;
-            }
-        } else {
-            'sub { "DUMMY" }'
-        }
-    } elsif (ref($value) eq 'HASH') {
-        my @keys = keys %$value;
-        if ($self->get_canonical) {
-            @keys = sort { $a cmp $b } @keys;
-        }
+    my $blessed = blessed($value);
 
-        join('',
-            '{',
-            $self->_nl,
-            (map {
-                    $self->_indent(1) . $self->_encode($_)
-                      . $self->_before_sp . '=>' . $self->_after_sp
-                      . $self->_encode($value->{$_})
-                      . "," . $self->_nl,
-                  } @keys),
-            $self->_indent,
-            '}',
-        );
-    } elsif (!ref($value)) {
+    if (defined $blessed) {
+        'bless(' . $self->_encode_basic($value) . ',' . $self->_encode_basic($blessed) . ')';
+    } else {
+        $self->_encode_basic($value);
+    }
+}
+
+sub _encode_basic {
+    my ($self, $value) = @_;
+
+    if (not defined $value) {
+        return 'undef';
+    }
+
+    my $reftype = reftype($value);
+    if (not defined $reftype) {
         my $flags = B::svref_2object(\$value)->FLAGS;
         return 0 + $value if $flags & (B::SVp_IOK | B::SVp_NOK) && $value * 0 == 0;
 
@@ -166,6 +136,49 @@ sub _encode {
             $value = Encode::is_utf8($value) ? Encode::encode_utf8($value) : $value;
             q{"} . $value . q{"};
         }
+    } elsif ($reftype eq 'ARRAY') {
+        join('',
+            '[',
+            $self->_nl,
+            (map { $self->_indent(1) . $self->_encode($_) . "," . $self->_nl }
+                @$value),
+            $self->_indent,
+            ']',
+        );
+    } elsif ($reftype eq 'CODE') {
+        if ($self->get_deparse) {
+            require B::Deparse;
+            my $code = B::Deparse->new($self->get_pretty ? '' : '-si0')->coderef2text($value);
+            $code = "sub ${code}";
+            if ($self->get_pretty) {
+                my $indent = $self->_indent;
+                $code =~ s/^/$indent/gm;
+                $code;
+            } else {
+                $code =~ s/\n//g;
+                $code;
+            }
+        } else {
+            'sub { "DUMMY" }'
+        }
+    } elsif ($reftype eq 'HASH') {
+        my @keys = keys %$value;
+        if ($self->get_canonical) {
+            @keys = sort { $a cmp $b } @keys;
+        }
+
+        join('',
+            '{',
+            $self->_nl,
+            (map {
+                    $self->_indent(1) . $self->_encode($_)
+                      . $self->_before_sp . '=>' . $self->_after_sp
+                      . $self->_encode($value->{$_})
+                      . "," . $self->_nl,
+                  } @keys),
+            $self->_indent,
+            '}',
+        );
     } else {
         die "Unknown type";
     }
