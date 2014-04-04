@@ -42,7 +42,7 @@ sub new {
     }, $class;
 }
 
-mk_accessor(__PACKAGE__, $_) for qw(pretty ascii deparse);
+mk_accessor(__PACKAGE__, $_) for qw(pretty ascii deparse canonical);
 
 sub encode {
     my ($self, $stuff) = @_;
@@ -84,6 +84,11 @@ sub _encode {
             'sub { "DUMMY" }'
         }
     } elsif (ref($value) eq 'HASH') {
+        my @keys = keys %$value;
+        if ($self->get_canonical) {
+            @keys = sort { $a cmp $b } @keys;
+        }
+
         join('',
             '{',
             $self->_nl,
@@ -92,8 +97,7 @@ sub _encode {
                       . $self->_before_sp . '=>' . $self->_after_sp
                       . $self->_encode($value->{$_})
                       . "," . $self->_nl,
-                  }
-                  keys %$value),
+                  } @keys),
             $self->_indent,
             '}',
         );
@@ -399,6 +403,14 @@ required by the PLON syntax or other flags. This results in a faster and more co
 
 If $enable is true (or missing), then the encode method will de-parse the code by L<B::Deparse>.
 Otherwise, encoder generates C<sub { "DUMMY" }> like L<Data::Dumper>.
+
+=item C<< $pson->canonical([$enabled]) >>
+
+=item C<< my $enabled = $pson->get_canonical() >>
+
+If $enable is true (or missing), then the "encode" method will output
+PLON objects by sorting their keys. This is adding a comparatively
+high overhead.
 
 =back
 
