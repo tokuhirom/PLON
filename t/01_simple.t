@@ -68,3 +68,24 @@ __DATA__
 ===
 --- input: [undef]
 --- expected: [undef,]
+
+===
+--- input: \1
+--- expected: \(1)
+
+===
+--- input: \\1
+--- expected: \(\(1))
+
+===
+--- input: bless([9], 'X')
+--- expected: bless([9,],"X")
+
+===
+--- input: bless({a=>9}, 'X')
+--- expected: bless({"a"=>9,},"X")
+
+===
+--- input: bless(\(do {my $o=1}), 'X')
+--- expected: bless(\(do {my $o=1}),"X")
+

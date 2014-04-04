@@ -6,6 +6,7 @@ use Scalar::Util qw(blessed reftype);
 use parent qw(Exporter);
 use B;
 use Encode ();
+use Carp ();
 
 our $VERSION = "0.06";
 
@@ -57,14 +58,14 @@ sub _encode {
     my $blessed = blessed($value);
 
     if (defined $blessed) {
-        'bless(' . $self->_encode_basic($value) . ',' . $self->_encode_basic($blessed) . ')';
+        'bless(' . $self->_encode_basic($value, 1) . ',' . $self->_encode_basic($blessed) . ')';
     } else {
         $self->_encode_basic($value);
     }
 }
 
 sub _encode_basic {
-    my ($self, $value) = @_;
+    my ($self, $value, $blessing) = @_;
 
     if (not defined $value) {
         return 'undef';
@@ -136,6 +137,14 @@ sub _encode_basic {
             $value = Encode::is_utf8($value) ? Encode::encode_utf8($value) : $value;
             q{"} . $value . q{"};
         }
+    } elsif ($reftype eq 'SCALAR') {
+        if ($blessing) {
+            '\\(do {my $o=' . $self->_encode($$value) . '})';
+        } else {
+            '\\(' . $self->_encode($$value) . ')';
+        }
+    } elsif ($reftype eq 'REF') {
+        '\\(' . $self->_encode($$value) . ')';
     } elsif ($reftype eq 'ARRAY') {
         join('',
             '[',
@@ -180,7 +189,7 @@ sub _encode_basic {
             '}',
         );
     } else {
-        die "Unknown type";
+        die "Unknown type: ${reftype}";
     }
 }
 
@@ -222,10 +231,20 @@ sub _decode {
         return $self->_decode_string();
     } elsif (/\G${WS}undef/gc) {
         return undef;
+    } elsif (/\G${WS}\\\(/gc) {
+        return $self->_decode_scalarref();
     } elsif (/\G${WS}sub\s*\{/gc) {
         return $self->_decode_code();
+    } elsif (/\G$WS"/gc) {
+        return $self->_decode_string;
+    } elsif (/\G$WS([0-9\.]+)/gc) {
+        return 0+$1;
+    } elsif (/\G${WS}bless\(/gc) {
+        return $self->_decode_object;
+    } elsif (/\G${WS}do \{my \$o=/gc) {
+        return $self->_decode_do;
     } else {
-        die "Unexpected token: " . substr($_, 0, 2);
+        Carp::confess("Unexpected token: " . substr($_, pos, 9));
     }
 }
 
@@ -234,10 +253,10 @@ sub _decode_hash {
 
     my %ret;
     until (/\G$WS(,$WS)?\}/gc) {
-        my $k = $self->_decode_term();
+        my $k = $self->_decode();
         /\G$WS=>$WS/gc
             or _exception("Unexpected token in Hash");
-        my $v = $self->_decode_term();
+        my $v = $self->_decode();
 
         $ret{$k} = $v;
 
@@ -252,32 +271,44 @@ sub _decode_array {
 
     my @ret;
     until (/\G$WS,?$WS\]/gc) {
-        my $term = $self->_decode_term();
+        my $term = $self->_decode();
         push @ret, $term;
     }
     return \@ret;
-}
-
-sub _decode_term {
-    my ($self) = @_;
-
-    if (/\G$WS"/gc) {
-        return $self->_decode_string;
-    } elsif (/\G$WS([0-9\.]+)/gc) {
-        0+$1;
-    } elsif (/\G${WS}undef/gc) {
-        return undef;
-    } elsif (/\G${WS}sub\s*\{/gc) {
-        return $self->_decode_code();
-    } else {
-        _exception("Not a term");
-    }
 }
 
 sub _decode_code {
     # We can't decode coderef. Because it makes security issue.
     # And, we can't detect end of code block.
     Carp::confess("Cannot decode PLON contains CodeRef.");
+}
+
+sub _decode_object {
+    my ($self) = @_;
+    my $body  = $self->_decode; # class name
+    m!\G${WS},\s*!gc
+        or _exception("Missing comma after bless");
+    my $str = $self->_decode; # class name
+    m!\G${WS}\)!gc
+        or _exception("Missing closing paren after bless");
+    return bless($body, $str);
+}
+
+sub _decode_scalarref {
+    my $self = shift;
+    my $value = $self->_decode();
+    /\G\s*\)/gc
+        or _exception("Missing closing paren after scalarref");
+    return \$value;
+}
+
+# do {my $o=3}
+sub _decode_do {
+    my $self = shift;
+    my $value = $self->_decode;
+    m!\G\}!gc
+        or _exception("Missing closing blace after `do {`");
+    return $value;
 }
 
 sub _decode_string {
