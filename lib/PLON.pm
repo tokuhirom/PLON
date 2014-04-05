@@ -10,7 +10,7 @@ use Carp ();
 
 our $VERSION = "0.07";
 
-our @EXPORT = qw(encode_pson decode_pson);
+our @EXPORT = qw(encode_pson decode_pson $_perl);
 
 our $INDENT;
 
