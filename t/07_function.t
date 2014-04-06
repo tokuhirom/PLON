@@ -4,7 +4,7 @@ use utf8;
 use Test::More;
 use PLON;
 
-is encode_pson([]), '[]';
+is encode_plon([]), '[]';
 is_deeply decode_pson('[]'), [];
 
 done_testing;

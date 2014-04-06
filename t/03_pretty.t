@@ -4,10 +4,10 @@ use utf8;
 use Test::More;
 use PLON;
 
-my $pson = PLON->new->pretty(1)->encode([
+my $plon = PLON->new->pretty(1)->encode([
     {a => [ qw(x y z)]},
 ]);
-is $pson, n(<<'...');
+is $plon, n(<<'...');
 [
   {
     "a" => [
@@ -20,10 +20,10 @@ is $pson, n(<<'...');
 ...
 
 {
-my $pson = PLON->new->pretty(1)->encode({
+my $plon = PLON->new->pretty(1)->encode({
     x => [a => [ qw(x y z)]],
 });
-is $pson, n(<<'...');
+is $plon, n(<<'...');
 {
   "x" => [
     "a",

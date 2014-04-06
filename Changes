@@ -25,7 +25,7 @@ Revision history for Perl extension PLON
     - Support undefined value
       (Reported by sharl++)
       https://github.com/tokuhirom/PLON/issues/3
-    - Implemented 'encode_pson' method.
+    - Implemented 'encode_plon' method.
       (Reported by syohex++)
       https://github.com/tokuhirom/PLON/issues/2
 

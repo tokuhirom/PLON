@@ -6,8 +6,8 @@ PLON - Serialize object to Perl code
 
     use PLON;
 
-    my $pson = encode_pson([]);
-    # $pson is `[]`
+    my $plon = encode_plon([]);
+    # $plon is `[]`
 
 # DESCRIPTION
 
@@ -23,7 +23,7 @@ Data::Dumper escapes multi byte chars. When I want copy-and-paste from Data::Dum
 # STABILITY
 
 This release is a prototype. Every API will change without notice.
-(But, I may not remove `encode_pson($scalar)` interface. You can use this.)
+(But, I may not remove `encode_plon($scalar)` interface. You can use this.)
 
 I need your feedback. If you have ideas or comments, please report to [Github Issues](https://github.com/tokuhirom/PLON/issues).
 
@@ -32,23 +32,23 @@ I need your feedback. If you have ideas or comments, please report to [Github Is
 The object oriented interface lets you configure your own encoding or
 decoding style, within the limits of supported formats.
 
-- $pson = PLON->new()
+- $plon = PLON->new()
 
     Creates a new PLON object that can be used to de/encode PLON
     strings. All boolean flags described below are by default _disabled_.
 
-- `$pson = $pson->pretty([$enabled])`
+- `$plon = $plon->pretty([$enabled])`
 
     This enables (or disables) all of the `indent`, `space_before` and
     `space_after` (and in the future possibly more) flags in one call to
     generate the most readable (or most compact) form possible.
 
-- `$pson->ascii([$enabled])`
-- `my $enabled = $pson->get_ascii()`
+- `$plon->ascii([$enabled])`
+- `my $enabled = $plon->get_ascii()`
 
-        $pson = $pson->ascii([$enable])
+        $plon = $plon->ascii([$enable])
 
-        $enabled = $pson->get_ascii
+        $enabled = $plon->get_ascii
 
     If $enable is true (or missing), then the encode method will not generate characters outside
     the code range 0..127. Any Unicode characters outside that range will be escaped using either
@@ -60,14 +60,14 @@ decoding style, within the limits of supported formats.
         PLON->new->ascii(1)->encode([chr 0x10401])
         => ["\x{10401}"]
 
-- `$pson->deparse([$enabled])`
-- `my $enabled = $pson->get_deparse()`
+- `$plon->deparse([$enabled])`
+- `my $enabled = $plon->get_deparse()`
 
     If $enable is true (or missing), then the encode method will de-parse the code by [B::Deparse](https://metacpan.org/pod/B::Deparse).
     Otherwise, encoder generates `sub { "DUMMY" }` like [Data::Dumper](https://metacpan.org/pod/Data::Dumper).
 
-- `$pson->canonical([$enabled])`
-- `my $enabled = $pson->get_canonical()`
+- `$plon->canonical([$enabled])`
+- `my $enabled = $plon->get_canonical()`
 
     If $enable is true (or missing), then the "encode" method will output
     PLON objects by sorting their keys. This is adding a comparatively

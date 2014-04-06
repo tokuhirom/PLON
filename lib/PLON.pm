@@ -10,13 +10,13 @@ use Carp ();
 
 our $VERSION = "0.07";
 
-our @EXPORT = qw(encode_pson decode_pson $_perl);
+our @EXPORT = qw(encode_plon decode_pson $_perl);
 
 our $INDENT;
 
 my $WS = qr{[ \t]*};
 
-sub encode_pson { PLON->new->encode(shift) }
+sub encode_plon { PLON->new->encode(shift) }
 sub decode_pson { PLON->new->decode(shift) }
 
 sub mk_accessor {
@@ -389,8 +389,8 @@ PLON - Serialize object to Perl code
 
     use PLON;
 
-    my $pson = encode_pson([]);
-    # $pson is `[]`
+    my $plon = encode_plon([]);
+    # $plon is `[]`
 
 =head1 DESCRIPTION
 
@@ -406,7 +406,7 @@ Data::Dumper escapes multi byte chars. When I want copy-and-paste from Data::Dum
 =head1 STABILITY
 
 This release is a prototype. Every API will change without notice.
-(But, I may not remove C<encode_pson($scalar)> interface. You can use this.)
+(But, I may not remove C<encode_plon($scalar)> interface. You can use this.)
 
 I need your feedback. If you have ideas or comments, please report to L<Github Issues|https://github.com/tokuhirom/PLON/issues>.
 
@@ -417,24 +417,24 @@ decoding style, within the limits of supported formats.
 
 =over 4
 
-=item $pson = PLON->new()
+=item $plon = PLON->new()
 
 Creates a new PLON object that can be used to de/encode PLON
 strings. All boolean flags described below are by default I<disabled>.
 
-=item C<< $pson = $pson->pretty([$enabled]) >>
+=item C<< $plon = $plon->pretty([$enabled]) >>
 
 This enables (or disables) all of the C<indent>, C<space_before> and
 C<space_after> (and in the future possibly more) flags in one call to
 generate the most readable (or most compact) form possible.
 
-=item C<< $pson->ascii([$enabled]) >>
+=item C<< $plon->ascii([$enabled]) >>
 
-=item C<< my $enabled = $pson->get_ascii() >>
+=item C<< my $enabled = $plon->get_ascii() >>
 
-    $pson = $pson->ascii([$enable])
+    $plon = $plon->ascii([$enable])
 
-    $enabled = $pson->get_ascii
+    $enabled = $plon->get_ascii
 
 If $enable is true (or missing), then the encode method will not generate characters outside
 the code range 0..127. Any Unicode characters outside that range will be escaped using either
@@ -446,16 +446,16 @@ required by the PLON syntax or other flags. This results in a faster and more co
     PLON->new->ascii(1)->encode([chr 0x10401])
     => ["\x{10401}"]
 
-=item C<< $pson->deparse([$enabled]) >>
+=item C<< $plon->deparse([$enabled]) >>
 
-=item C<< my $enabled = $pson->get_deparse() >>
+=item C<< my $enabled = $plon->get_deparse() >>
 
 If $enable is true (or missing), then the encode method will de-parse the code by L<B::Deparse>.
 Otherwise, encoder generates C<sub { "DUMMY" }> like L<Data::Dumper>.
 
-=item C<< $pson->canonical([$enabled]) >>
+=item C<< $plon->canonical([$enabled]) >>
 
-=item C<< my $enabled = $pson->get_canonical() >>
+=item C<< my $enabled = $plon->get_canonical() >>
 
 If $enable is true (or missing), then the "encode" method will output
 PLON objects by sorting their keys. This is adding a comparatively

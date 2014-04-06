@@ -8,13 +8,13 @@ filters {
     input => ['eval'],
 };
 
-my $pson = PLON->new();
+my $plon = PLON->new();
 for my $block (blocks) {
     subtest $block->expected, sub {
-        my $got = $pson->encode($block->input);
+        my $got = $plon->encode($block->input);
         is $got, $block->expected;
         is_deeply eval($got), $block->input;
-        is_deeply $pson->decode($got), $block->input;
+        is_deeply $plon->decode($got), $block->input;
 
         {
             # decode with eval
