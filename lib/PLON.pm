@@ -8,7 +8,7 @@ use B;
 use Encode ();
 use Carp ();
 
-our $VERSION = "0.07";
+our $VERSION = "0.08";
 
 our @EXPORT = qw(encode_plon decode_pson $_perl);
 
